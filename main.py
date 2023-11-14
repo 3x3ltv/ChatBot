@@ -1,38 +1,38 @@
-from telegram.ext import Updater, MessageHandler, CommandHandler
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
 from telegram import Location
-import logging
 
-# Установка уровня логирования
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-# Замените 'YOUR_BOT_TOKEN' на токен вашего бота
+# Замените 'YOUR_BOT_TOKEN' на фактический токен вашего бота
 TOKEN = '6721006067:AAEpHivlsux5MYKh49UdWdrNC9KGwFT5nGQ'
 
-# Создание объектов Updater и Dispatcher
-updater = Updater(token=TOKEN, use_context=True)
-dispatcher = updater.dispatcher
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Привет! Этот бот реагирует на отправленную геолокацию.')
 
-# Обработчик команды /start
-def start(update, context):
-    context.bot.send_message(chat_id=update.effective_chat.id, text="Привет! Отправь мне свою геолокацию.")
-
-# Обработчик геолокации
-def location_handler(update, context):
+def location_handler(update: Update, context: CallbackContext) -> None:
     user_location = update.message.location
     latitude = user_location.latitude
     longitude = user_location.longitude
 
-    # Пример: создаем текстовый ответ на основе геолокации
-    response_text = f"Ты находишься на широте {latitude} и долготе {longitude}."
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response_text)
+    # Пример: создаем текстовое сообщение на основе координат
+    response_message = f'Вы находитесь на координатах: {latitude}, {longitude}'
 
-# Добавление обработчиков команд и геолокации
-start_handler = CommandHandler('start', start)
-location_handler = MessageHandler(Filters.location, location_handler)
+    update.message.reply_text(response_message)
 
-dispatcher.add_handler(start_handler)
-dispatcher.add_handler(location_handler)
+def main() -> None:
+    updater = Updater(TOKEN)
+    dispatcher = updater.dispatcher
 
-# Запуск бота
-updater.start_polling()
-updater.idle()
+    # Обработка команды /start
+    dispatcher.add_handler(CommandHandler("start", start))
+
+    # Обработка геолокации
+    dispatcher.add_handler(MessageHandler(filters.Location, location_handler))
+
+    # Запускаем бота
+    updater.start_polling()
+
+    # Ожидаем завершение работы бота (например, нажатие Ctrl+C)
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
