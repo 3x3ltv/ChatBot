@@ -12,25 +12,16 @@ def get_updates(offset=0):
 def send_message(chat_id, text):
     requests.get(f'{URL}{TOKEN}/sendMessage?chat_id={chat_id}&text={text}')
 
-def reply_keyboard(chat_id, message_text):
-    reply_markup = {
-        "keyboard": [["Привет", "Hello"]],
-        "resize_keyboard": True,
-        "one_time_keyboard": True
-    }
-    data = {'chat_id': chat_id, 'text': message_text, 'reply_markup': json.dumps(reply_markup)}
+def reply_keyboard(chat_id, text):
+    reply_markup ={ "keyboard": [["Привет", "Hello"]], "resize_keyboard": True, "one_time_keyboard": True}
+    data = {'chat_id': chat_id, 'text': text, 'reply_markup': json.dumps(reply_markup)}
     requests.post(f'{URL}{TOKEN}/sendMessage', data=data)
 
-
 def check_message(chat_id, message):
-    if 'text' in message:
-        user_message = message['text'].lower()
-        if user_message in ['привет', 'hello']:
-            send_message(chat_id, 'Привет :)')
-        else:
-            reply_keyboard(chat_id, 'Я не понимаю тебя :(')
-    elif 'location' in message:
-        reply_keyboard(chat_id, 'Твои координаты: {}, {}'.format(message['location']['latitude'], message['location']['longitude']))
+    if message.lower() in ['привет', 'hello']:
+        send_message(chat_id, 'Привет :)')
+    else:
+        reply_keyboard(chat_id, 'Я не понимаю тебя :(')
 
 def run():
     update_id = get_updates()[-1]['update_id'] # Сохраняем ID последнего отправленного сообщения боту
@@ -44,7 +35,7 @@ def run():
                 if (user_message := message['message'].get('text')): # Проверим, есть ли текст в сообщении
                     check_message(message['message']['chat']['id'], user_message) # Отвечаем
                 if (user_location := message['message'].get('location')): # Проверим, если ли location в сообщении
-                    print(user_location)
+                    reply_keyboard(update_id, user_location)
 
 if __name__ == '__main__':
     run()
