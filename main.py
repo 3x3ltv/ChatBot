@@ -35,8 +35,8 @@ def handle_location(update: Update, context: CallbackContext) -> None:
             min_distance = distance
             closest_location = base_coord["name"]
             closest_text = base_coord["text"]
+            image_url = base_coord["URL_link"]
 
-    image_url = closest_location.get("URL_link")
     if image_url:
         # Отправка изображения по URL
         image_data = requests.get(image_url).content
