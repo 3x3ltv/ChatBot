@@ -1,41 +1,41 @@
-import requests
-import time
-import json
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
+from telegram._update import Update
+# Замените 'YOUR_TOKEN' на реальный токен вашего бота
+TOKEN = 'YOUR_TOKEN'
 
-TOKEN = '6721006067:AAEpHivlsux5MYKh49UdWdrNC9KGwFT5nGQ'
-URL = 'https://api.telegram.org/bot'
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Привет! Я бот. Чем могу помочь?')
 
-def get_updates(offset=0):
-    result = requests.get(f'{URL}{TOKEN}/getUpdates?offset={offset}').json()
-    return result['result']
-
-def send_message(chat_id, text):
-    requests.get(f'{URL}{TOKEN}/sendMessage?chat_id={chat_id}&text={text}')
-
-def reply_keyboard(chat_id, text):
-    reply_markup ={ "keyboard": [["Привет", "Hello"]], "resize_keyboard": True, "one_time_keyboard": True}
-    data = {'chat_id': chat_id, 'text': text, 'reply_markup': json.dumps(reply_markup)}
-    requests.post(f'{URL}{TOKEN}/sendMessage', data=data)
-
-def check_message(chat_id, message):
-    if message.lower() in ['привет', 'hello']:
-        send_message(chat_id, 'Привет :)')
+def handle_text_message(update: Update, context: CallbackContext) -> None:
+    user_message = update.message.text.lower()
+    if user_message == 'привет':
+        update.message.reply_text('Привет!')
+    elif user_message == 'как дела':
+        update.message.reply_text('У меня все отлично, спасибо! А у тебя?')
     else:
-        reply_keyboard(chat_id, 'Я не понимаю тебя :(')
+        update.message.reply_text('Я не понимаю тебя :(')
 
-def run():
-    update_id = get_updates()[-1]['update_id'] # Сохраняем ID последнего отправленного сообщения боту
-    while True:
-        time.sleep(2)
-        messages = get_updates(update_id) # Получаем обновления
-        for message in messages:
-            # Если в обновлении есть ID больше чем ID последнего сообщения, значит пришло новое сообщение
-            if update_id < message['update_id']:
-                update_id = message['update_id']# Сохраняем ID последнего отправленного сообщения боту
-                if (user_message := message['message'].get('text')): # Проверим, есть ли текст в сообщении
-                    check_message(message['message']['chat']['id'], user_message) # Отвечаем
-                if (user_location := message['message'].get('location')): # Проверим, если ли location в сообщении
-                    reply_keyboard(message['message']['chat']['id'], message.location)
+def handle_location(update: Update, context: CallbackContext) -> None:
+    location = update.message.location
+    latitude = location.latitude
+    longitude = location.longitude
+    update.message.reply_text(f'Твои координаты: {latitude}, {longitude}')
+
+def main() -> None:
+    updater = Updater(TOKEN)
+    dp = updater.dispatcher
+
+    # Обработчики команд
+    dp.add_handler(CommandHandler("start", start))
+
+    # Обработчик текстовых сообщений
+    dp.add_handler(MessageHandler(filters=filters.TEXT & ~filters.COMMAND, callback=handle_text_message))
+
+    # Обработчик геолокации
+    dp.add_handler(MessageHandler(filters=filters.LOCATION, callback=handle_location))
+
+    updater.start_polling()
+    updater.idle()
 
 if __name__ == '__main__':
-    run()
+    main()
