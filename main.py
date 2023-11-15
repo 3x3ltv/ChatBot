@@ -12,11 +12,15 @@ def get_updates(offset=0):
 def send_message(chat_id, text):
     requests.get(f'{URL}{TOKEN}/sendMessage?chat_id={chat_id}&text={text}')
 
-def reply_keyboard(chat_id, location):
-    latitude = location['latitude']
-    longitude = location['longitude']
-    response_text = f'Твои координаты: {latitude}, {longitude}'
-    send_message(chat_id, response_text)
+def reply_keyboard(chat_id, message_text):
+    reply_markup = {
+        "keyboard": [["Привет", "Hello"]],
+        "resize_keyboard": True,
+        "one_time_keyboard": True
+    }
+    data = {'chat_id': chat_id, 'text': message_text, 'reply_markup': json.dumps(reply_markup)}
+    requests.post(f'{URL}{TOKEN}/sendMessage', data=data)
+
 
 def check_message(chat_id, message):
     if 'text' in message:
@@ -24,9 +28,9 @@ def check_message(chat_id, message):
         if user_message in ['привет', 'hello']:
             send_message(chat_id, 'Привет :)')
         else:
-            reply_keyboard(chat_id, message)
+            reply_keyboard(chat_id, 'Я не понимаю тебя :(')
     elif 'location' in message:
-        reply_keyboard(chat_id, message)
+        reply_keyboard(chat_id, 'Твои координаты: {}, {}'.format(message['location']['latitude'], message['location']['longitude']))
 
 def run():
     update_id = get_updates()[-1]['update_id'] # Сохраняем ID последнего отправленного сообщения боту
