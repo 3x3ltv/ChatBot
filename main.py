@@ -40,9 +40,9 @@ def handle_location(update: Update, context: CallbackContext) -> None:
     if image_url:
         # Отправка изображения по URL
         image_data = requests.get(image_url).content
-        update.message.reply_photo(photo=InputFile(io.BytesIO(image_data)), caption=f'Ближайшее место это: {closest_location["name"]}. Вот немного его истории: {closest_location["text"]}')
+        update.message.reply_photo(photo=InputFile(io.BytesIO(image_data)), caption=f'Ближайшее место это: {closest_location}. Вот немного его истории: {closest_text}')
     else:
-        update.message.reply_text(f'Ближайшее место это: {closest_location["name"]}. Вот немного его истории: {closest_location["text"]}')
+        update.message.reply_text(f'Ближайшее место это: {closest_location}. Вот немного его истории: {closest_text}')
 
 
 def main() -> None:
