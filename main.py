@@ -42,9 +42,10 @@ def handle_location(update: Update, context: CallbackContext) -> None:
         if distance < min_distance:
             min_distance = distance
             closest_location = base_coord["name"]
+            closest_text = base_coord["text"]
 
     # Возвращаем ответ с учетом ближайшей локации
-    update.message.reply_text(f'Твои координаты: {latitude}, {longitude}. Ближайшее место: {closest_location}')
+    update.message.reply_text(f'Ближайшее место: {closest_location} Вот немного истории: {closest_text}')
 
 def main() -> None:
     updater = Updater(TOKEN)
