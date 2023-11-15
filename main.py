@@ -35,7 +35,7 @@ def run():
                 if (user_message := message['message'].get('text')): # Проверим, есть ли текст в сообщении
                     check_message(message['message']['chat']['id'], user_message) # Отвечаем
                 if (user_location := message['message'].get('location')): # Проверим, если ли location в сообщении
-                    reply_keyboard(message['message']['chat']['id'], message['location'])
+                    reply_keyboard(message['message']['chat']['id'], message.location)
 
 if __name__ == '__main__':
     run()
