@@ -3,7 +3,7 @@ import time
 import json
 
 TOKEN = '6721006067:AAEpHivlsux5MYKh49UdWdrNC9KGwFT5nGQ'
-URL = 'https://web.telegram.org/k/#@PetrSide_bot'
+URL = 'https://api.telegram.org/bot'
 
 def get_updates(offset=0):
     result = requests.get(f'{URL}{TOKEN}/getUpdates?offset={offset}').json()
