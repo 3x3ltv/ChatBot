@@ -7,11 +7,11 @@ from base_coordinates import base_coordinates
 TOKEN = '6721006067:AAEpHivlsux5MYKh49UdWdrNC9KGwFT5nGQ'
 
 def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Привет! Я Знаток Петроградской стороны Петербурга. Чтобы получить информаию о ближайшем историческом здании к вам, просто пришлите мне свою геолокацию!')
+    update.message.reply_text('Привет! Я Знаток Петроградской стороны Петербурга. Чтобы получить информацию о ближайшем историческом здании к вам, просто пришлите мне свою геолокацию!')
 
 def handle_text_message(update: Update, context: CallbackContext) -> None:
     user_message = update.message.text.lower()
-    if user_message == 'привет':
+    if user_message == 'Привет':
         update.message.reply_text('Привет!')
     else:
         update.message.reply_text('Я не понимаю тебя :(')
