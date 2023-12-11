@@ -1,3 +1,4 @@
+from scipy.spatial import KDTree
 from telegram import Update, InputFile
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import requests
@@ -16,26 +17,19 @@ def handle_text_message(update: Update, context: CallbackContext) -> None:
     else:
         update.message.reply_text('Я не понимаю тебя :(')
 
+base_coords_tree = KDTree([(coord["latitude"], coord["longitude"]) for coord in base_coordinates])
+
 def handle_location(update: Update, context: CallbackContext) -> None:
     location = update.message.location
     latitude = location.latitude
     longitude = location.longitude
 
-    closest_location = None
-    min_distance = float('inf')
-    for base_coord in base_coordinates:
-        base_latitude = base_coord["latitude"]
-        base_longitude = base_coord["longitude"]
+    # Используем k-d дерево для поиска ближайшей локации
+    _, index = base_coords_tree.query((latitude, longitude))
 
-        # Рассчитываем расстояние между базовой точкой и точкой пользователя
-        distance = ((latitude - base_latitude)**2 + (longitude - base_longitude)**2)**0.5
-
-        # Если расстояние меньше, чем минимальное до этого, обновляем ближайшую локацию
-        if distance < min_distance:
-            min_distance = distance
-            closest_location = base_coord["name"]
-            closest_text = base_coord["text"]
-            image_url = base_coord["URL_link"]
+    closest_location = base_coordinates[index]["name"]
+    closest_text = base_coordinates[index]["text"]
+    image_url = base_coordinates[index]["URL_link"]
 
     if image_url:
         # Отправка изображения по URL
